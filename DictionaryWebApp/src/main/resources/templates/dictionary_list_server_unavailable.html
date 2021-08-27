@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Dictionaries Management System</title>
+        <meta charset="UTF-8"></meta>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha2/css/bootstrap.min.css" 
+              integrity="sha384-DhY6onE6f3zzKbjUPRc2hOzGAdEf4/Dz+WJwBvEYL/lkkIsI3ihufq9hk9K4lVoK"
+              crossorigin="anonymous">
+        <link th:href="@{/styles/styles.css}" rel="stylesheet" />
+    </head>
+    <body class="p-3 mb-2 bg-dark text-white">
+            <div class="container p-3 mb-2 bg-light text-dark">           
+                <h1> Dictionary Management System Console</h1>
+                <div class="alert alert-danger" role="alert" th:text="${error}"></div>
+            </div>
+    </body>
+</html>

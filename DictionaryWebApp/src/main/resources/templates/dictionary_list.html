@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Dictionaries Management System</title>
+        <meta charset="UTF-8"></meta>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha2/css/bootstrap.min.css" 
+              integrity="sha384-DhY6onE6f3zzKbjUPRc2hOzGAdEf4/Dz+WJwBvEYL/lkkIsI3ihufq9hk9K4lVoK"
+              crossorigin="anonymous">
+        <link th:href="@{/styles/styles.css}" rel="stylesheet" />
+    </head>
+    <body class="p-3 mb-2 bg-dark text-white">
+            <div class="container p-3 mb-2 bg-light text-dark">           
+                <h1>Dictionaries List</h1>
+                <a th:href ="@{/dms/newDictionaryForm}" class="btn btn-primary mb-2 col-2"> Add Dictionary </a>
+                <div class="alert alert-success" role="alert" th:text="${success}" th:if="${success}"></div>
+                <div class="alert alert-danger" role="alert" th:text="${error}" th:if="${error}"></div>
+                <table border="2" class="table table-striped table-responsive-md">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Author</th>
+                            <th>Created At</th>
+                            <th>Status</th>
+                            <th>Master Dictionary</th>
+                            <th>Items</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="dictionary : ${dictionaryList}">
+                            <td th:text="${dictionary.name}"></td>
+                            <td th:text="${dictionary.description}"></td>
+                            <td th:text="${dictionary.author}"></td>                          
+                            <td th:text="${dictionary.createdAt}"></td>
+                            <td th:text="${dictionary.status}"></td>
+                            <td th:text="${dictionary.masterDictionaryName}"></td>
+                            <td th:text="${dictionary.items}"></td>
+                            <td> 
+                                <a th:href="@{/dms/showItems/{dictionaryId}(dictionaryId=${dictionary.id})}" class="btn btn-primary" style="width: 110px">Show Items</a> 
+                                <a th:href="@{/dms/showFormForUpdate/{id}(id=${dictionary.id})}" class="btn btn-secondary" style="width: 80px">Update</a> 
+                                <br>
+                                <span th:if="${dictionary.status == 'Active'}">
+                                    <a th:href="@{/dms/deactivateDictionary/{id}(id=${dictionary.id})}" class="btn btn-warning" style="width: 110px">Deactivate</a>
+                                </span>
+                                <span th:unless="${dictionary.status == 'Active'}">
+                                    <a th:href="@{/dms/activateDictionary/{id}(id=${dictionary.id})}" class="btn btn-success" style="width: 110px">Activate</a>
+                                </span>
+                      
+                                <a th:href="@{/dms/deleteDictionary/{id}(id=${dictionary.id})}" class="btn btn-danger" style="width: 80px">Delete</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+    </body>
+</html>

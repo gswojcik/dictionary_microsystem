@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Dictionaries Management System</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha2/css/bootstrap.min.css" 
+              integrity="sha384-DhY6onE6f3zzKbjUPRc2hOzGAdEf4/Dz+WJwBvEYL/lkkIsI3ihufq9hk9K4lVoK"
+              crossorigin="anonymous">
+        <link th:href="@{/styles/styles.css}" rel="stylesheet" />
+    </head>
+    <body class="p-3 mb-2 bg-dark text-white">
+        <div class="container p-3 mb-2 bg-light text-dark">
+            <h1>Dictionary Manager - Update</h1>       
+            <hr>
+            <form action="#" th:action="@{/dms/saveDictionary}" th:object="${dictionary}" method="POST">
+                <input type="hidden" th:field="*{id}">
+                <h7> Title: </h7>
+                <input type="text" th:field="*{name}" placeholder="Dictionary name" class="form-control mb-4 col-4">        
+                <h7> Description: </h7>
+                <input type="text" th:field="*{description}" placeholder="Description" class="form-control mb-4 col-4">
+                <h7> Author: </h7>   
+                <input type="text" th:field="*{author}" placeholder="Author" class="form-control mb-4 col-4">
+                <h7> Set master dictionary: </h7>
+                <br>
+                    <select th:field="*{masterDictionaryId}" id='dictionary_code' name='dictionary_code' class="col-lg-3">
+                        <option th:each="dict : ${dictionaries}"
+                            th:value="${dict.id}"
+                            th:text="${dict.name}" />
+                        </select>
+                <hr>                          
+                <table class="table table-responsive-md">
+                    <tbody>
+                        <tr>
+                            <td>
+                                <button type="submit" class="btn btn-info col-2"> Save </button>
+                                <a th:href="@{/dms}" class="btn btn-primary col-2">Back</a>
+                            </td>
+                        </tr>
+                    </tbody>                          
+                </table>              
+            </form>            
+        </div>
+    </body>
+</html>

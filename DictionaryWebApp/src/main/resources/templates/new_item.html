@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Dictionaries Management System</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha2/css/bootstrap.min.css" 
+              integrity="sha384-DhY6onE6f3zzKbjUPRc2hOzGAdEf4/Dz+WJwBvEYL/lkkIsI3ihufq9hk9K4lVoK"
+              crossorigin="anonymous">
+    </head>
+    <body class="p-3 mb-2 bg-dark text-white">
+        <div class="container p-3 mb-2 bg-light text-dark">
+            <h1>Dictionary Manager</h1>
+            <hr>
+            <h2>Save Item</h2>
+            <form action="#" th:action="@{/dms/saveItem}" th:object="${item}" method="POST">
+                <input type="hidden" th:field="*{dictionaryId}">
+                <input type="text" th:field="*{term}" placeholder="Name" class="form-control mb-4 col-4">        
+                <input type="text" th:field="*{description}" placeholder="Description" class="form-control mb-4 col-4"> 
+                <div class="container">
+                    <div class="col-sm-3">
+                        <h7> Set master item: </h7>
+                    </div>
+                    <div class="col-lg-3">
+                        <select th:field="*{aliasId}" id='dictionary_code' name='dictionary_code' class="form-control">
+                            <option th:value="0" text="None"></option>
+                            <option th:each="item : ${items}"
+                                 th:value="${item.id}"
+                                 th:text="${item.filter}" />
+                         </select>
+                    </div>
+                    <hr>
+                </div>                   
+                    <table class="table table-responsive-md">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <button type="submit" class="btn btn-info col-2"> Save </button>
+                                    <a th:href="@{/dms/showItems/{dictionaryId}(dictionaryId=*{dictionaryId})}" class="btn btn-primary col-2">Back</a>
+                                </td>
+                            </tr>
+                        </tbody>                          
+                    </table>      
+            </form>
+        </div>
+    </body>
+</html>
