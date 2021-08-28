@@ -1,78 +1,99 @@
-# dictionary_microservices
+# Dictionary Microsystem
+
+Project assumptions:
+
+Containerized application supporting the universal dictionary microsystem.
+
+    1. Database (mysql engine) contains tables dict_conf (dictionaries definition) and dict_item (dictionary items definition).
+        Dictionaries can be related to each other. One can be a subdictionary of another. Dictionary item can be an alias of another item.
+    2. Backend, RestAPI:
+        - dictionaries list
+        - dictionary items
+        - add / edit / activate / deactivate a dictionary
+        - add / edit / activate / deactivate a position
+        - simple registry
+        - batch processing (activating and deactivating dictionary or items) starting from API 
+        - batch processing termination
+    3. Web application:
+        - dictionaries list with actions: add / archive / delete 
+        - directory items with actions like above
+    4. Additional information:
+        - Db component as database schema
+        - Backend and web app are separate containers
 
 MySql shema:
 
 	\CONFIG-EXAMPLE\mysql_schema.sql
 	\CONFIG-EXAMPLE\mysql_schema_with_example_data.sql
 
+    or have to:
+        - create user with DDL & DML permissions
+        - create database "dictionary" 
+        - application creates schema on startup
+
 Docker images: 
 	
-	Rest Web Service: https://hub.docker.com/r/gsw91/d-ws2
-	Web Application: https://hub.docker.com/r/gsw91/d-ws2_app
-	
-Docker configuration:
+	Rest WebService: https://hub.docker.com/r/gsw91/d-ws2:1.1
+	Web Application: https://hub.docker.com/r/gsw91/d-ws2_app:1.1
 
-	*** ALL CONFIG EXAMPLES ARE IN "/CONFIG-EXAMPLE/" DIR ***
 
-	Rest Web Service: 
-	
-		1. Create dir /dws-config/
-			a. Create file dws-config.properties
-			b. Set content: 
-				## MySQL DB Access
-				dws.app.db_connection_string=YOUR_CONNECTION_STRING
-				dws.app.db_user=_YOUR_USER
-				dws.app.db_password=YOUR_PASSWORD
-				
-				example:
-				
-				## MySQL DB Access
-				dws.app.db_connection_string=jdbc:mysql://000.000.0.0:3306/dictionary?serverTimezone=Europe/Warsaw&useSSL=False
-				dws.app.db_user=user
-				dws.app.db_password=password
-				
-		2. Create dir /file-processing/archive/
-			a. Dir /file-processing/ for files to process (with webhook call)
-			b. Dir /file-processing/archive/ here the processed files are moving
-			c. Files type must be .csv with three columns incuding header, example:
-				type;id;setActive
-				item;18;0
-				dict;10;0
-				item;19;0
-				dict;3;1
-			
-		3. Prepare and run command (example cmd):
-		
-			### delete container if exists (optional)
-			docker container rm DictionaryWebService
-			
-			### delete volume if exists (read-only, config file) 
-			docker volume rm dws-config
-			
-			### create container with volumes (where --mount type=bind,source=YOUR_OWN_PATH place your own path)
-			docker container create --name DictionaryWebService -v dws-config:/dws-config ^
-					--mount type=bind,source=YOUR_OWN_PATH/file-processing,target=/file-processing ^
-					-p 8080:8080 gsw91/d-ws2:latest
-				
-			### copy config file to volume and start
-			docker cp dws-config/dws-config.properties DictionaryWebService:/dws-config/dws-config.properties
-			docker start DictionaryWebService 
-			pause 
-			
-		4. After start, server base url endpoint is: localhost:8080/DictionaryWebService
-			Documentation (swagger) endpoint: localhost:8080/DictionaryWebService/swagger-ui/#/
+Docker pre configuration for application:
 
-	Web Application: 
-		
-		1. Prepare and run command (example cmd):
-			### delete container if exists
-			docker container rm DictionaryWebApp
-			
-			### run container with param - Web Service base url (with port)!
-			docker run -e "app.base_url=http://000.000.0.0:8080" ^
-					-d ^
-					-p 8989:8989 ^
-					--name DictionaryWebApp ^
-					gsw91/d-ws2_app:latest
-			
-		2. After start, the application's base endpoint is: localhost:8989/dms
+    1. Create network for containers: dictionary-microsystem-network 
+    2. Add this network to mysql container
+    3. Create volume for files processing and copy there the content from /CONFIG-EXAMPLE/file-procesing/
+        a. Container dir /file-processing/ contains files to process (on webhook call)
+		b. Container dir /file-processing/archive/ contains the processed files
+		c. Files type must be .csv with three columns incuding header, example:
+			type;id;setActive
+			item;18;0
+			dict;10;0
+			item;19;0
+			dict;3;1
+
+Docker compose:
+
+- after startup
+    - api (swagger): http://${HOST}:8080/DictionaryWebService/swagger-ui/#/
+    - client: http://${HOST}:8081/dms
+
+
+    version: "3.7"
+
+    services:
+
+        dictionary-rest-service:
+            image: gsw91/d-ws2:1.1
+            container_name: dictionary-rest-service
+            ports:
+                - "8080:8080"
+            environment:
+                APP_DB_CONNECTION_STRING: {example: jdbc:mysql://home-db/dictionary?serverTimezone=Europe/Warsaw&useSSL=False}
+                APP_DB_USER: {YOUR_USER}
+                APP_DB_PASSWORD: {YOUR_PASSWORD}
+            networks:
+                - dictionary-microsystem-network
+            volumes:
+                - dictionary-files:/app/file-processing
+            restart: unless-stopped
+    
+        dictionary-web-client:
+            image: gsw91/d-ws2_app:1.1
+            container_name: dictionary-web-app
+            ports:
+                - "8081:8081"
+            environment:
+                REST_BASE_URL: http://dictionary-rest-service:8080
+            networks:
+                - dictionary-microsystem-network
+            restart: unless-stopped
+            depends_on:
+                - dictionary-rest-service
+
+    networks:
+        dictionary-microsystem-network:
+            external: true
+
+    volumes:
+        dictionary-files:
+            external: true
