@@ -12,7 +12,7 @@ Containerized application supporting the universal dictionary microsystem.
         - add / edit / activate / deactivate a dictionary
         - add / edit / activate / deactivate a position
         - simple registry
-        - batch processing (activating and deactivating dictionary or items) starting from API 
+        - batch processing (activating and deactivating dictionary or items) starting from API (test -> webhook.site)
         - batch processing termination
     3. Web application:
         - dictionaries list with actions: add / archive / delete 
@@ -21,8 +21,8 @@ Containerized application supporting the universal dictionary microsystem.
         - Db component as database schema
         - Backend and web app are separate containers
 
-MySql shema:
-
+MySql schema:
+    
 	\CONFIG-EXAMPLE\mysql_schema.sql
 	\CONFIG-EXAMPLE\mysql_schema_with_example_data.sql
 
@@ -30,6 +30,27 @@ MySql shema:
         - create user with DDL & DML permissions
         - create database "dictionary" 
         - application creates schema on startup
+
+    or run this docker compose:
+  
+    version: "3.7"
+    services:
+      db:
+        image: mysql:8.0.26
+        container_name: home-db
+        restart: always
+        ports:
+          - "8880:3306"
+        networks:
+          - dictionary-microsystem-network
+        environment:
+          MYSQL_ROOT_PASSWORD: {ROOT_PASSWORD}
+          MYSQL_DATABASE: dictionary
+          MYSQL_USER: {USERNAME}
+          MYSQL_PASSWORD: {PASSWORD}
+    networks:
+      dictionary-microsystem-network:
+      external: true
 
 Docker images: 
 	
@@ -69,8 +90,8 @@ Docker compose:
                 - "8080:8080"
             environment:
                 APP_DB_CONNECTION_STRING: {example: jdbc:mysql://home-db/dictionary?serverTimezone=Europe/Warsaw&useSSL=False}
-                APP_DB_USER: {YOUR_USER}
-                APP_DB_PASSWORD: {YOUR_PASSWORD}
+                APP_DB_USER: {USER}
+                APP_DB_PASSWORD: {PASSWORD}
             networks:
                 - dictionary-microsystem-network
             volumes:
